@@ -25,6 +25,28 @@ function Chat() {
     setOpenChat((prev) => !prev);
     handleToolTip(false);
   };
+  
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (openTooltip) {
+        setOpenTooltip(false); // Close tooltip when scrolling
+      }
+    };
+    const handleScrollEnd = () => {
+      const isWelcomeToastChat = localStorage.getItem("isWelcomeToastChat");
+
+      setOpenTooltip(isWelcomeToastChat === "false" ? false : true);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scrollend", handleScrollEnd);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scrollend", handleScrollEnd);
+    };
+  }, [openTooltip]);
+  
   return (
     <div>
       <Tooltip
