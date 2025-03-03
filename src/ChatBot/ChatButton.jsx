@@ -54,7 +54,7 @@ const ChatButton = ({
           reader.readAsDataURL(audioBlob);
           reader.onloadend = () => {
             // Send the base64 audio via the socket.
-            
+
             socket.send(
               JSON.stringify({
                 type: "audio",
@@ -84,7 +84,7 @@ const ChatButton = ({
           <div className="flex items-center px-4 py-4 w-full justify-between">
             <button
               type="button"
-              className="h-6 w-6 hover:!bg-transparent focus:!bg-transparent rounded-full p-1 inline-flex items-center  text-white"
+              className="h-6 !border-none w-6 hover:!bg-transparent !bg-transparent focus:!bg-transparent rounded-full p-1 inline-flex items-center  text-white"
               onClick={() => stopRecording(false)}
             >
               <img src={CloseWhite} alt="close" />
@@ -94,7 +94,7 @@ const ChatButton = ({
             </div>
             <button
               type="button"
-              className="h-7 w-7 rounded-full p-1 hover:!bg-transparent focus:!bg-transparent inline-flex items-center  text-white"
+              className="h-7 w-7 !border-none rounded-full p-1 hover:!bg-transparent  !bg-transparent focus:!bg-transparent inline-flex items-center  text-white"
               onClick={() => stopRecording(true)}
             >
               <img src={SendWhite} alt="close" />
@@ -114,7 +114,7 @@ const ChatButton = ({
               }}
             />
             <button
-              className="inline-flex hover:!bg-transparent focus:!bg-transparent items-center justify-center bg-white rounded-md text-sm font-medium disabled:pointer-events-none disabled:opacity-50 h-10 w-10"
+              className="inline-flex hover:!bg-transparent !bg-transparent border-none focus:!bg-transparent items-center justify-center bg-white rounded-md text-sm font-medium disabled:pointer-events-none disabled:opacity-50 h-10 w-10"
               onClick={
                 message?.length > 0
                   ? () => onSendMessage(message)
@@ -122,12 +122,12 @@ const ChatButton = ({
               }
             >
               {message?.length > 0 ? (
-                <img src={Send} alt="send" className="w-7" />
+                <img src={Send} alt="send" className="w-7 min-w-7" />
               ) : (
                 <img
                   src={Mic}
                   alt="mic"
-                  className={isRecording ? "animate-pulse" : ""}
+                  className={` min-w-5 w-5 ${isRecording ? "animate-pulse" : ""}`}
                 />
               )}
             </button>

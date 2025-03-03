@@ -212,7 +212,7 @@ function ChatPopup({ message, setMessage }) {
               How can we help?
             </span>
           </div>
-          <div className="flex items-center gap-2 justify-end absolute -bottom-8 right-1 z-10 bg-white p-1">
+          <div className="flex items-center gap-2 justify-end absolute -bottom-8 right-5 z-10 bg-white p-1 !pr-0">
             <span className="text-[#707d95] text-xs font-medium ">
               Audio mode
             </span>

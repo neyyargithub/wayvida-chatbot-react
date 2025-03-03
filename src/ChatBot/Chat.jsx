@@ -1,9 +1,9 @@
 import { Tooltip } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import ChatPopup from "./ChatPopup";
-import Close from './assets/chat/close.svg'
-import Down from './assets/chat/down.svg'
-import Messa from './assets/chat/message.svg'
+import Close from "./assets/chat/close.svg";
+import Down from "./assets/chat/down.svg";
+import Messa from "./assets/chat/message.svg";
 function Chat() {
   const [openTooltip, setOpenTooltip] = useState(true);
   const [openChat, setOpenChat] = useState(false);
@@ -25,7 +25,6 @@ function Chat() {
     setOpenChat((prev) => !prev);
     handleToolTip(false);
   };
-  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,10 +45,11 @@ function Chat() {
       window.removeEventListener("scrollend", handleScrollEnd);
     };
   }, [openTooltip]);
-  
+
   return (
     <div>
       <Tooltip
+        id="chatbottooltip"
         content={
           <div className="relative px-2 py-2 ">
             <button
@@ -60,7 +60,7 @@ function Chat() {
               }}
             >
               <img src={Close} alt="close" />
-              </button>
+            </button>
             <span className="text-sm font-normal text-[#575757]">
               Welcome to Wayvida Ai
               <br /> Experts are available to
@@ -76,15 +76,10 @@ function Chat() {
       >
         <button
           type="button"
-          className="h-12 w-12 rounded-full  flex items-center justify-center p-2.5 text-center bg-gradient-to-b from-[#E35981] to-[#436CE5] fixed bottom-20 right-6"
+          className={`h-12 w-12 border-none rounded-full  flex items-center justify-center p-2.5 text-center bg-gradient-to-b ${openChat?'from-[#6D808C] to-[#3A3C3E]':'from-[#E35981] to-[#436CE5]'} fixed bottom-20 right-6`}
           onClick={handleChatPopup}
         >
-          <img
-            src={
-              openChat ? Down : Messa
-            }
-            alt={openChat ? "close" : "msg"}
-          />
+          <img src={openChat ? Down : Messa} alt={openChat ? "close" : "msg"} />
         </button>
       </Tooltip>
       {openChat && <ChatPopup message={message} setMessage={setMessage} />}
