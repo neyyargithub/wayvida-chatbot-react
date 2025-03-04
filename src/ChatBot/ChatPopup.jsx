@@ -212,7 +212,7 @@ function ChatPopup({ message, setMessage }) {
               How can we help?
             </span>
           </div>
-          <div className="flex items-center gap-2 justify-end absolute -bottom-8 right-5 z-10 bg-white p-1 !pr-0">
+          <div className="flex items-center gap-2 justify-end absolute -bottom-8 right-0 z-10 bg-white p-1 !pr-5 w-full">
             <span className="text-[#707d95] text-xs font-medium ">
               Audio mode
             </span>
@@ -220,7 +220,6 @@ function ChatPopup({ message, setMessage }) {
               size="sm"
               color="secondary"
               isSelected={audioEnabled}
-              
               onValueChange={(checked) => handleAudioMode(checked)}
             />
           </div>
