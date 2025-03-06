@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
-import ChatButton from "./ChatButton";
-import { resolveSocketApiBaseUrl } from "../resoveApiBaseUrl";
-import BgChat from "./assets/chat/bgchat.jpg";
-import Ai from "./assets/chat/ai.svg";
-import Thinking from "./assets/chat/thinking.gif";
-import Preparing from "./assets/chat/preparing.gif";
 import { Switch } from "@heroui/react";
+import React, { useEffect, useRef, useState } from "react";
+import { resolveSocketApiBaseUrl } from "../resoveApiBaseUrl";
+import Ai from "./assets/chat/ai.svg";
+import BgChat from "./assets/chat/bgchat.jpg";
+import Preparing from "./assets/chat/preparing.gif";
+import Thinking from "./assets/chat/thinking.gif";
+import ChatButton from "./ChatButton";
+import "./noscroll.css";
 
 function ChatPopup({ message, setMessage }) {
   const [popupHeight, setPopupHeight] = useState(window.innerHeight - 200);
@@ -16,6 +17,7 @@ function ChatPopup({ message, setMessage }) {
   const [botTyping, setBotTyping] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [isAudioProcessing, setIsAudioProcessing] = useState(false);
 
   // Refs to hold the in-progress streaming message and debouncing timer
   const streamingMessageRef = useRef(null);
@@ -68,6 +70,7 @@ function ChatPopup({ message, setMessage }) {
         return;
       } else if (data.startsWith("[USER_SAID]")) {
         // Process a voice message from the user.
+        setIsAudioProcessing(false);
         setBotTyping(false);
         const userSpeech = data.replace("[USER_SAID]", "").trim();
 
@@ -227,8 +230,8 @@ function ChatPopup({ message, setMessage }) {
         {!isConnecting ? (
           <>
             <div
-              className="px-5 pt-6 pb-11 overflow-y-scroll min-w-full flex flex-col w-full gap-4"
-              style={{ height: `${popupHeight - 110}px` }}
+              className="px-5 pt-6 pb-11 overflow-y-scroll min-w-full flex flex-col w-full gap-4 no-scrollbar"
+              style={{ height: `${popupHeight - 125}px` }}
               ref={chatBoxRef}
             >
               {messages.map((msg, index) => (
@@ -272,6 +275,13 @@ function ChatPopup({ message, setMessage }) {
                   </div>
                 </div>
               )}
+              {isAudioProcessing && (
+                <div className={`flex gap-1 text-sm  justify-end`}>
+                  <div className={`p-2.5 rounded-xl bg-[#fbefe7]`}>
+                    <img src={Thinking} alt="thinking" loading="eager" />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex items-center absolute bottom-0 w-full">
               <ChatButton
@@ -280,11 +290,15 @@ function ChatPopup({ message, setMessage }) {
                 setMessage={setMessage}
                 socket={socket.current}
                 addMessage={addMessage}
+                setIsAudioProcessing={setIsAudioProcessing}
               />
             </div>
           </>
         ) : (
-          <div className="relative flex h-full w-full flex-col items-center justify-center gap-2">
+          <div
+            className="relative flex  w-full flex-col items-center justify-center gap-2"
+            style={{ height: `${popupHeight - 110}px` }}
+          >
             <img src={Preparing} alt="preparing" loading="eager" />
             <span className=" text-center text-xs font-medium text-[#61728d]">
               Preparing assistant!

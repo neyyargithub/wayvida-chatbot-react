@@ -12,6 +12,7 @@ const ChatButton = ({
   setMessage,
   socket,
   addMessage,
+  setIsAudioProcessing,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
 
@@ -54,7 +55,7 @@ const ChatButton = ({
           reader.readAsDataURL(audioBlob);
           reader.onloadend = () => {
             // Send the base64 audio via the socket.
-
+            setIsAudioProcessing(true);
             socket.send(
               JSON.stringify({
                 type: "audio",
@@ -103,7 +104,7 @@ const ChatButton = ({
         ) : (
           <>
             <input
-              className="flex h-10 w-full rounded-md px-3 py-3 focus:outline-none text-sm placeholder-[#a5aebd] placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-50 text-[#030712]"
+              className="flex h-14 w-full rounded-md px-3 py-3 focus:outline-none text-sm placeholder-[#a5aebd] placeholder:text-xs disabled:cursor-not-allowed disabled:opacity-50 text-[#030712]"
               placeholder="Type your message"
               onChange={(e) => setMessage(e.target.value)}
               value={message}
@@ -122,12 +123,14 @@ const ChatButton = ({
               }
             >
               {message?.length > 0 ? (
-                <img src={Send} alt="send" className="w-7 min-w-7" />
+                <img src={Send} alt="send" className="w-5 min-w-5" />
               ) : (
                 <img
                   src={Mic}
                   alt="mic"
-                  className={` min-w-5 w-5 ${isRecording ? "animate-pulse" : ""}`}
+                  className={` min-w-5 w-5 ${
+                    isRecording ? "animate-pulse" : ""
+                  }`}
                 />
               )}
             </button>
