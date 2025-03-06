@@ -230,7 +230,7 @@ function ChatPopup({ message, setMessage }) {
         {!isConnecting ? (
           <>
             <div
-              className="px-5 pt-6 pb-11 overflow-y-scroll min-w-full flex flex-col w-full gap-4 no-scrollbar"
+              className="px-5 pt-7 pb-11 overflow-y-scroll min-w-full flex flex-col w-full gap-4 no-scrollbar"
               style={{ height: `${popupHeight - 125}px` }}
               ref={chatBoxRef}
             >
