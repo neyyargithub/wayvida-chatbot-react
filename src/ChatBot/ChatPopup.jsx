@@ -5,10 +5,11 @@ import Ai from "./assets/chat/ai.svg";
 import BgChat from "./assets/chat/bgchat.jpg";
 import Preparing from "./assets/chat/preparing.gif";
 import Thinking from "./assets/chat/thinking.gif";
+import CloseMobile from "./assets/chat/closemobile.svg";
 import ChatButton from "./ChatButton";
 import "./noscroll.css";
 
-function ChatPopup({ message, setMessage }) {
+function ChatPopup({ message, setMessage, handleChatPopup }) {
   const [popupHeight, setPopupHeight] = useState(window.innerHeight - 200);
   const [messages, setMessages] = useState([]);
   const socket = useRef(null);
@@ -23,7 +24,11 @@ function ChatPopup({ message, setMessage }) {
   const streamingMessageRef = useRef(null);
   const flushTimerRef = useRef(null);
   const audioEnabledRef = useRef(false);
-
+  let session_id = localStorage.getItem("session_id") || generateSessionId();
+  localStorage.setItem("session_id", session_id);
+  function generateSessionId() {
+    return crypto.randomUUID();
+  }
   useEffect(() => {
     audioEnabledRef.current = audioEnabled; // Update ref without triggering re-render
   }, [audioEnabled]);
@@ -37,12 +42,16 @@ function ChatPopup({ message, setMessage }) {
   };
 
   useEffect(() => {
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "inherit";
     const isAudioEnabled = localStorage.getItem("isAudioEnabled");
 
     if (isAudioEnabled) {
       setAudioEnabled(isAudioEnabled === "false" ? false : true);
     }
-    socket.current = new WebSocket(`${resolveSocketApiBaseUrl()}/chat`);
+    socket.current = new WebSocket(
+      `${resolveSocketApiBaseUrl()}/professional/chat?session_id=${session_id}`
+    );
 
     socket.current.onopen = () => {
       console.log("Connected to WebSocket");
@@ -121,27 +130,27 @@ function ChatPopup({ message, setMessage }) {
         }
         return;
       } else {
-        // Regular bot message streaming.
         setBotTyping(false);
-        if (!streamingMessageRef.current) {
-          streamingMessageRef.current = { sender: "Bot", content: data };
-          setMessages((prev) => [...prev, streamingMessageRef.current]);
-        } else {
-          streamingMessageRef.current.content += data;
+
+        // Immediately push the message update without debounce
+        setMessages((prev) => [...prev, { sender: "Bot", content: data }]);
+
+        streamingMessageRef.current = { sender: "Bot", content: data };
+
+        if (flushTimerRef.current) {
+          clearTimeout(flushTimerRef.current);
         }
-        // Debounce updates to avoid word-by-word rendering.
-        if (!flushTimerRef.current) {
-          flushTimerRef.current = setTimeout(() => {
-            setMessages((prev) => {
-              const newMessages = [...prev];
-              newMessages[newMessages.length - 1] = {
-                ...streamingMessageRef.current,
-              };
-              return newMessages;
-            });
-            flushTimerRef.current = null;
-          }, 300);
-        }
+
+        flushTimerRef.current = setTimeout(() => {
+          setMessages((prev) => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1] = {
+              ...streamingMessageRef.current,
+            };
+            return newMessages;
+          });
+          flushTimerRef.current = null;
+        }, 50); // Reduce debounce time for faster updates
       }
     };
 
@@ -151,6 +160,8 @@ function ChatPopup({ message, setMessage }) {
     };
 
     return () => {
+      document.body.style.overflow = "";
+      document.body.style.height = "";
       socket.current.close();
       if (flushTimerRef.current) {
         clearTimeout(flushTimerRef.current);
@@ -165,6 +176,7 @@ function ChatPopup({ message, setMessage }) {
   }, []);
 
   function addMessage(sender, content) {
+    if(!content?.trim()) return 
     setMessages((prev) => [...prev, { sender, content }]);
     requestAnimationFrame(() => {
       if (chatBoxRef.current) {
@@ -199,7 +211,7 @@ function ChatPopup({ message, setMessage }) {
         boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
         height: `${popupHeight}px`,
       }}
-      className="fixed bottom-[calc(4rem+5rem)] right-0 sm:mr-4 bg-white rounded-lg border border-[#e5e7eb] w-full sm:w-[440px]"
+      className="fixed bottom-[4rem] sm:bottom-[calc(4rem+5rem)] right-0 sm:mr-4 bg-white rounded-lg border border-[#e5e7eb] w-full sm:w-[440px]"
     >
       <div className="relative h-full w-full">
         <div className="flex flex-col space-y-2 relative">
@@ -208,12 +220,18 @@ function ChatPopup({ message, setMessage }) {
             alt="bg"
             className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
           />
-          <div className="relative z-10 p-4 pb-5">
+          <div className="relative z-10 p-4 pb-5 sm:block flex items-start justify-between ">
             <span className="text-white text-2xl font-medium">
               Hi there 👋
               <br />
               How can we help?
             </span>
+            <img
+              src={CloseMobile}
+              alt="close"
+              onClick={handleChatPopup}
+              className="sm:hidden block h-7 w-7 cursor-pointer [pointer-events:all]"
+            />
           </div>
           <div className="flex items-center gap-2 justify-end absolute -bottom-8 right-0 z-10 bg-white p-1 !pr-5 w-full">
             <span className="text-[#707d95] text-xs font-medium ">
@@ -230,7 +248,7 @@ function ChatPopup({ message, setMessage }) {
         {!isConnecting ? (
           <>
             <div
-              className="px-5 pt-7 pb-11 overflow-y-scroll min-w-full flex flex-col w-full gap-4 no-scrollbar"
+              className="px-5 pt-8 pb-11 overflow-y-scroll min-w-full flex flex-col w-full gap-4 no-scrollbar"
               style={{ height: `${popupHeight - 125}px` }}
               ref={chatBoxRef}
             >

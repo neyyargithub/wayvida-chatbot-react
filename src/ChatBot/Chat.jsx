@@ -76,13 +76,26 @@ function Chat() {
       >
         <button
           type="button"
-          className={`h-12 w-12 border-none rounded-full  flex items-center justify-center p-2.5 text-center bg-gradient-to-b ${openChat?'from-[#6D808C] to-[#3A3C3E]':'from-[#E35981] to-[#436CE5]'} fixed bottom-20 right-6`}
+          // className={`h-12 w-12 border-none rounded-full  flex items-center justify-center p-2.5 text-center bg-gradient-to-b ${openChat?'from-[#6D808C] to-[#3A3C3E]':'from-[#E35981] to-[#436CE5]'} fixed bottom-20 right-6`}
+          className={`sm:h-12 sm:w-12 h-10 w-10 rounded-full  ${
+            openChat ? "hidden sm:flex" : "flex"
+          } items-center justify-center sm:p-2.5 p-2 text-center bg-gradient-to-b  ${
+            openChat
+              ? "from-[#6D808C] to-[#3A3C3E]"
+              : "from-[#E35981] to-[#436CE5]"
+          } fixed bottom-20 right-6`}
           onClick={handleChatPopup}
         >
           <img src={openChat ? Down : Messa} alt={openChat ? "close" : "msg"} />
         </button>
       </Tooltip>
-      {openChat && <ChatPopup message={message} setMessage={setMessage} />}
+      {openChat && (
+        <ChatPopup
+          message={message}
+          setMessage={setMessage}
+          handleChatPopup={handleChatPopup}
+        />
+      )}
     </div>
   );
 }

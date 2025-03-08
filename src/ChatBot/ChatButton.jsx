@@ -5,6 +5,7 @@ import CloseWhite from "./assets/chat/closewhite.svg";
 import SendWhite from "./assets/chat/sendwhite.svg";
 import Send from "./assets/chat/send.svg";
 import Mic from "./assets/chat/mic.svg";
+import { useReverseTimer } from "./hooks/useReverseTimer";
 
 const ChatButton = ({
   message,
@@ -19,10 +20,13 @@ const ChatButton = ({
   // Use refs to store the recorder and audio chunks across renders.
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
-
+  const { timeLeft, startTimer, stopTimer } = useReverseTimer(20, () =>
+    stopRecording(true)
+  );
   async function startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      startTimer();
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -66,7 +70,7 @@ const ChatButton = ({
           };
         };
       }
-
+      stopTimer();
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
@@ -92,6 +96,9 @@ const ChatButton = ({
             </button>
             <div className="flex items-center gap-2">
               <img src={Listening} alt="listening" className="h-5" />
+              <span className="text-white text-sm font-medium ">{`00:${
+                timeLeft < 10 ? `0${timeLeft}` : timeLeft
+              }`}</span>
             </div>
             <button
               type="button"
