@@ -50,7 +50,7 @@ function ChatPopup({ message, setMessage, handleChatPopup }) {
       setAudioEnabled(isAudioEnabled === "false" ? false : true);
     }
     socket.current = new WebSocket(
-      `${resolveSocketApiBaseUrl()}/professional/chat?session_id=${session_id}`
+      `${resolveSocketApiBaseUrl()}/wordpress/chat?session_id=${session_id}`
     );
 
     socket.current.onopen = () => {
