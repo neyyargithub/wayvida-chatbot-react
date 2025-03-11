@@ -8,6 +8,7 @@ import Thinking from "./assets/chat/thinking.gif";
 import CloseMobile from "./assets/chat/closemobile.svg";
 import ChatButton from "./ChatButton";
 import "./noscroll.css";
+import Markdown from "react-markdown";
 
 function ChatPopup({ message, setMessage, handleChatPopup }) {
   const [popupHeight, setPopupHeight] = useState(window.innerHeight - 200);
@@ -176,7 +177,7 @@ function ChatPopup({ message, setMessage, handleChatPopup }) {
   }, []);
 
   function addMessage(sender, content) {
-    if(!content?.trim()) return 
+    if (!content?.trim()) return;
     setMessages((prev) => [...prev, { sender, content }]);
     requestAnimationFrame(() => {
       if (chatBoxRef.current) {
@@ -274,10 +275,9 @@ function ChatPopup({ message, setMessage, handleChatPopup }) {
                       }`}
                     >
                       {/* Using dangerouslySetInnerHTML to render potential HTML content */}
-                      <span
-                        className="text-[#1c1e21] text-xs font-medium"
-                        dangerouslySetInnerHTML={{ __html: msg.content }}
-                      />
+                      <span className="text-[#1c1e21] text-xs font-medium">
+                        <Markdown>{msg.content}</Markdown>
+                      </span>
                     </div>
                   </div>
                 </div>
