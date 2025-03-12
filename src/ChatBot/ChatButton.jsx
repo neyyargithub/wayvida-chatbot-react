@@ -86,7 +86,7 @@ const ChatButton = ({
         } rounded-b-lg`}
       >
         {isRecording ? (
-          <div className="flex items-center px-4 py-4 w-full justify-between">
+          <div className="flex items-center px-4 py-3 w-full justify-between">
             <button
               type="button"
               className="h-6 !border-none w-6 hover:!bg-transparent !bg-transparent focus:!bg-transparent rounded-full p-1 inline-flex items-center  text-white"
@@ -102,7 +102,7 @@ const ChatButton = ({
             </div>
             <button
               type="button"
-              className="h-7 w-7 !border-none rounded-full p-1 hover:!bg-transparent  !bg-transparent focus:!bg-transparent inline-flex items-center  text-white"
+              className="h-9 w-9 !border-none rounded-full p-1 hover:!bg-transparent  !bg-transparent focus:!bg-transparent inline-flex items-center  text-white"
               onClick={() => stopRecording(true)}
             >
               <img src={SendWhite} alt="close" />

@@ -85,7 +85,7 @@ function ChatPopup({ message, setMessage, handleChatPopup }) {
         const userSpeech = data.replace("[USER_SAID]", "").trim();
 
         addMessage(
-          "You",
+          "You(speech)",
           `<span style='display:flex;align-items:center; gap:4px;'>
           ${userSpeech} <svg
             width="15px"
@@ -257,27 +257,38 @@ function ChatPopup({ message, setMessage, handleChatPopup }) {
                 <div
                   key={index}
                   className={`flex gap-1 text-sm  ${
-                    msg.sender === "You" ? "justify-end" : ""
+                    msg.sender === "You" || msg.sender === "You(speech)"
+                      ? "justify-end"
+                      : ""
                   }`}
                 >
                   <div
                     key={index}
                     className={`flex gap-1 text-sm  max-w-[85%]`}
                   >
-                    {msg.sender !== "You" && (
+                    {msg.sender !== "You" && msg.sender !== "You(speech)" && (
                       <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
                         <img src={Ai} alt="bot" />
                       </span>
                     )}
                     <div
                       className={`p-2.5 rounded-xl ${
-                        msg.sender === "You" ? "bg-[#fbefe7]" : "bg-[#eaf4ff]"
+                        msg.sender === "You" || msg.sender === "You(speech)"
+                          ? "bg-[#fbefe7]"
+                          : "bg-[#eaf4ff]"
                       }`}
                     >
                       {/* Using dangerouslySetInnerHTML to render potential HTML content */}
-                      <span className="text-[#1c1e21] text-xs font-medium">
-                        <Markdown>{msg.content}</Markdown>
-                      </span>
+                      {msg.sender === "You(speech)" ? (
+                        <span
+                          className="text-[#1c1e21] text-xs font-medium"
+                          dangerouslySetInnerHTML={{ __html: msg.content }}
+                        />
+                      ) : (
+                        <span className="text-[#1c1e21] text-xs font-medium">
+                          <Markdown>{msg.content}</Markdown>
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
