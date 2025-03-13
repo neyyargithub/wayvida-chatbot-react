@@ -4,11 +4,19 @@ import ChatPopup from "./ChatPopup";
 import Close from "./assets/chat/close.svg";
 import Down from "./assets/chat/down.svg";
 import Messa from "./assets/chat/message.svg";
+// ✅ Check for tooltip rendering globally
+if (!window.chatbotConfig) window.chatbotConfig = { tooltipAlreadyRendered: false };
 function Chat() {
-  const [openTooltip, setOpenTooltip] = useState(true);
+  const [openTooltip, setOpenTooltip] = useState(
+    !window.chatbotConfig.tooltipAlreadyRendered
+  );
   const [openChat, setOpenChat] = useState(false);
   const [message, setMessage] = useState("");
   useEffect(() => {
+    if (!window.chatbotConfig.tooltipAlreadyRendered) {
+      window.chatbotConfig.tooltipAlreadyRendered = true;
+      setOpenTooltip(true)
+    }
     const isWelcomeToastChat = localStorage.getItem("isWelcomeToastChat");
 
     if (isWelcomeToastChat) {
