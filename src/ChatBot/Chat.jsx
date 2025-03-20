@@ -5,7 +5,8 @@ import Close from "./assets/chat/close.svg";
 import Down from "./assets/chat/down.svg";
 import Messa from "./assets/chat/message.svg";
 // ✅ Check for tooltip rendering globally
-if (!window.chatbotConfig) window.chatbotConfig = { tooltipAlreadyRendered: false };
+if (!window.chatbotConfig)
+  window.chatbotConfig = { tooltipAlreadyRendered: false };
 function Chat() {
   const [openTooltip, setOpenTooltip] = useState(
     !window.chatbotConfig.tooltipAlreadyRendered
@@ -15,7 +16,7 @@ function Chat() {
   useEffect(() => {
     if (!window.chatbotConfig.tooltipAlreadyRendered) {
       window.chatbotConfig.tooltipAlreadyRendered = true;
-      setOpenTooltip(true)
+      setOpenTooltip(true);
     }
     const isWelcomeToastChat = localStorage.getItem("isWelcomeToastChat");
 
@@ -29,9 +30,29 @@ function Chat() {
     setOpenTooltip(state);
     localStorage.setItem("isWelcomeToastChat", state);
   };
+  // const handleChatPopup = () => {
+  //   setOpenChat((prev) => !prev);
+  //   handleToolTip(false);
+  // };
   const handleChatPopup = () => {
-    setOpenChat((prev) => !prev);
-    handleToolTip(false);
+    setOpenChat((prev) => {
+      const isOpening = !prev;
+
+      if (isOpening) {
+        // Disable background scrolling when chat opens
+        document.body.style.overflow = "hidden";
+        document.body.style.height = "100vh"; // Prevents background expansion
+      } else {
+        // Enable scrolling when chat closes
+        document.body.style.overflow = "";
+        document.body.style.height = "";
+      }
+
+      // Close tooltip when opening the chat
+      handleToolTip(false);
+
+      return isOpening;
+    });
   };
 
   useEffect(() => {
@@ -53,6 +74,13 @@ function Chat() {
       window.removeEventListener("scrollend", handleScrollEnd);
     };
   }, [openTooltip]);
+
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = ""; // Reset scrolling when component unmounts
+      document.body.style.height = "";
+    };
+  }, []);
 
   return (
     <div>
@@ -85,7 +113,7 @@ function Chat() {
         <button
           type="button"
           // className={`h-12 w-12 border-none rounded-full  flex items-center justify-center p-2.5 text-center bg-gradient-to-b ${openChat?'from-[#6D808C] to-[#3A3C3E]':'from-[#E35981] to-[#436CE5]'} fixed bottom-20 right-6`}
-          className={`sm:h-12 sm:w-12 h-10 w-10 rounded-full  ${
+          className={`sm:h-12 sm:w-12 h-10 w-10 rounded-full z-[1000000]  ${
             openChat ? "hidden sm:flex" : "flex"
           } items-center justify-center sm:p-2.5 p-2 text-center bg-gradient-to-b  ${
             openChat
