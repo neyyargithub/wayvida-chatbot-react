@@ -119,7 +119,7 @@ function Chat() {
             openChat
               ? "from-[#6D808C] to-[#3A3C3E]"
               : "from-[#E35981] to-[#436CE5]"
-          } fixed bottom-20 right-6`}
+          } fixed bottom-10 right-6`}
           onClick={handleChatPopup}
         >
           <img src={openChat ? Down : Messa} alt={openChat ? "close" : "msg"} />

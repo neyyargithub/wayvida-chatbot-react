@@ -212,7 +212,7 @@ function ChatPopup({ message, setMessage, handleChatPopup }) {
         boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
         height: `${popupHeight}px`,
       }}
-      className="fixed z-[100] bottom-[4rem] sm:bottom-[calc(4rem+5rem)] right-0 sm:mr-4 bg-white rounded-lg border border-[#e5e7eb] w-full sm:w-[440px]"
+      className="fixed z-[100] bottom-[0rem] sm:bottom-[calc(4rem+5rem)] right-0 sm:mr-4 bg-white rounded-lg border border-[#e5e7eb] w-full sm:w-[440px]"
     >
       <div className="relative h-full w-full">
         <div className="flex flex-col space-y-2 relative">
