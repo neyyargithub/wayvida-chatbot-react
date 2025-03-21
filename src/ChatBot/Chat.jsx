@@ -34,18 +34,39 @@ function Chat() {
   //   setOpenChat((prev) => !prev);
   //   handleToolTip(false);
   // };
+  // const handleChatPopup = () => {
+  //   setOpenChat((prev) => {
+  //     const isOpening = !prev;
+
+  //     if (isOpening) {
+  //       // Disable background scrolling when chat opens
+  //       document.body.style.overflow = "hidden";
+  //       document.body.style.height = "100vh"; // Prevents background expansion
+  //     } else {
+  //       // Enable scrolling when chat closes
+  //       document.body.style.overflow = "";
+  //       document.body.style.height = "";
+  //     }
+
+  //     // Close tooltip when opening the chat
+  //     handleToolTip(false);
+
+  //     return isOpening;
+  //   });
+  // };
+
   const handleChatPopup = () => {
     setOpenChat((prev) => {
       const isOpening = !prev;
 
       if (isOpening) {
-        // Disable background scrolling when chat opens
-        document.body.style.overflow = "hidden";
-        document.body.style.height = "100vh"; // Prevents background expansion
+        // ✅ Disable background scrolling completely
+        document.documentElement.style.overflow = "hidden"; // Prevents scrolling on <html>
+        document.body.style.overflow = "hidden"; // Prevents scrolling on <body>
       } else {
-        // Enable scrolling when chat closes
+        // ✅ Re-enable background scrolling when chat closes
+        document.documentElement.style.overflow = "";
         document.body.style.overflow = "";
-        document.body.style.height = "";
       }
 
       // Close tooltip when opening the chat
