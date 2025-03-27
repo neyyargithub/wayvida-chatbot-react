@@ -43,7 +43,7 @@ function ChatPopup({ message, setMessage, handleChatPopup }) {
   };
 
   useEffect(() => {
-    document.body.style.overflow = "hidden"; 
+    document.body.style.overflow = "hidden";
     document.body.style.height = "inherit";
     const isAudioEnabled = localStorage.getItem("isAudioEnabled");
 
@@ -198,12 +198,31 @@ function ChatPopup({ message, setMessage, handleChatPopup }) {
     setMessage("");
   }
 
-  function playAudio(base64Audio) {
+  function playAudio(base64Audio, mimeType = "audio/mp3") {
+    // if (audioElement.current) {
+    //   audioElement.current.pause();
+    // }
+    // audioElement.current = new Audio(base64Audio);
+    // audioElement.current.play();
     if (audioElement.current) {
       audioElement.current.pause();
     }
-    audioElement.current = new Audio(base64Audio);
-    audioElement.current.play();
+
+    // Convert Base64 to Blob
+    const binaryString = atob(base64Audio.split(",")[1]); // Remove data URL prefix if present
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const blob = new Blob([bytes], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Play Audio
+    audioElement.current = new Audio(blobUrl);
+    audioElement.current
+      .play()
+      .catch((error) => console.log("Playback error:", error));
   }
 
   return (

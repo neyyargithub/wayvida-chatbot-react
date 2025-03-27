@@ -6,6 +6,7 @@ import SendWhite from "./assets/chat/sendwhite.svg";
 import Send from "./assets/chat/send.svg";
 import Mic from "./assets/chat/mic.svg";
 import { useReverseTimer } from "./hooks/useReverseTimer";
+import RecordRTC from "recordrtc";
 
 const ChatButton = ({
   message,
@@ -23,24 +24,84 @@ const ChatButton = ({
   const { timeLeft, startTimer, stopTimer } = useReverseTimer(20, () =>
     stopRecording(true)
   );
+  // async function startRecording() {
+  //   try {
+  //     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  //     startTimer();
+  //     const mediaRecorder = new MediaRecorder(stream);
+  //     mediaRecorderRef.current = mediaRecorder;
+  //     audioChunksRef.current = [];
+
+  //     // Collect data as it becomes available.
+  //     mediaRecorder.ondataavailable = (event) => {
+  //       audioChunksRef.current.push(event.data);
+  //     };
+
+  //     mediaRecorder.start();
+  //     setIsRecording(true);
+  //   } catch (error) {
+  //     console.error("Microphone access error:", error);
+
+  //     addToast({
+  //       title: "Please allow microphone access.",
+  //     });
+  //   }
+  // }
+
+  // async function stopRecording(send = true) {
+  //   if (mediaRecorderRef.current) {
+  //     // Set up the onstop handler before stopping the recorder.
+  //     if (send) {
+  //       mediaRecorderRef.current.onstop = async () => {
+  //         const audioBlob = new Blob(audioChunksRef.current, {
+  //           type: "audio/webm",
+  //         });
+  //         const reader = new FileReader();
+  //         reader.readAsDataURL(audioBlob);
+  //         reader.onloadend = () => {
+  //           // Send the base64 audio via the socket.
+  //           setIsAudioProcessing(true);
+  //           socket.send(
+  //             JSON.stringify({
+  //               type: "audio",
+  //               content: reader.result,
+  //               voice: "shimmer",
+  //             })
+  //           );
+  //         };
+  //       };
+  //     }
+  //     stopTimer();
+  //     mediaRecorderRef.current.stop();
+  //     setIsRecording(false);
+  //   }
+  // }
+  const recorderRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+
   async function startRecording() {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
       startTimer();
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
 
-      // Collect data as it becomes available.
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
+      // Initialize RecordRTC
+      recorderRef.current = new RecordRTC(mediaStreamRef.current, {
+        type: "audio",
+        mimeType: "audio/webm", // Change to "audio/wav" if needed
+        recorderType: RecordRTC.StereoAudioRecorder,
+        numberOfAudioChannels: 1, // 1 for mono, 2 for stereo
+        timeSlice: 1000, // Collect chunks every second
+        ondataavailable: (blob) => {
+          audioChunksRef.current.push(blob);
+        },
+      });
 
-      mediaRecorder.start();
+      recorderRef.current.startRecording();
       setIsRecording(true);
     } catch (error) {
       console.error("Microphone access error:", error);
-
       addToast({
         title: "Please allow microphone access.",
       });
@@ -48,17 +109,18 @@ const ChatButton = ({
   }
 
   async function stopRecording(send = true) {
-    if (mediaRecorderRef.current) {
-      // Set up the onstop handler before stopping the recorder.
-      if (send) {
-        mediaRecorderRef.current.onstop = async () => {
-          const audioBlob = new Blob(audioChunksRef.current, {
-            type: "audio/webm",
-          });
+    if (recorderRef.current) {
+      stopTimer();
+
+      // Stop recording
+      recorderRef.current.stopRecording(() => {
+        let audioBlob = recorderRef.current.getBlob();
+
+        if (send) {
           const reader = new FileReader();
           reader.readAsDataURL(audioBlob);
           reader.onloadend = () => {
-            // Send the base64 audio via the socket.
+            // Send the base64-encoded audio via WebSocket
             setIsAudioProcessing(true);
             socket.send(
               JSON.stringify({
@@ -68,14 +130,18 @@ const ChatButton = ({
               })
             );
           };
-        };
-      }
-      stopTimer();
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
+        }
+
+        // Cleanup: Stop the media stream & reset recorder
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+        recorderRef.current.destroy();
+        recorderRef.current = null;
+        audioChunksRef.current = [];
+        mediaStreamRef.current = null;
+        setIsRecording(false);
+      });
     }
   }
-
   return (
     <>
       <div
